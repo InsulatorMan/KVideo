@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Icons } from '@/components/ui/Icon';
@@ -75,14 +74,16 @@ export function VideoMetadata({ videoData, source, title }: VideoMetadataProps) 
               <span className="font-semibold">主演：</span>
               <span className="inline-flex flex-wrap gap-1">
                 {splitPersonNames(videoData.vod_actor).map((name) => (
-                  <Link
+                  <a
                     key={name}
-                    href={`/?q=${encodeURIComponent(name)}`}
-                    data-focusable
-                    className="inline-block px-2 py-0.5 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-color)] hover:bg-[color-mix(in_srgb,var(--accent-color)_15%,transparent)] hover:border-[var(--accent-color)] hover:text-[var(--accent-color)] transition-all duration-200"
+                    href={`https://movie.douban.com/celebrities/search?search_text=${encodeURIComponent(name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-color)] hover:bg-[color-mix(in_srgb,var(--accent-color)_15%,transparent)] hover:border-[var(--accent-color)] hover:text-[var(--accent-color)] transition-all duration-200"
                   >
                     {name}
-                  </Link>
+                    <Icons.ExternalLink size={10} />
+                  </a>
                 ))}
               </span>
             </div>
@@ -92,14 +93,16 @@ export function VideoMetadata({ videoData, source, title }: VideoMetadataProps) 
               <span className="font-semibold">导演：</span>
               <span className="inline-flex flex-wrap gap-1">
                 {splitPersonNames(videoData.vod_director).map((name) => (
-                  <Link
+                  <a
                     key={name}
-                    href={`/?q=${encodeURIComponent(name)}`}
-                    data-focusable
-                    className="inline-block px-2 py-0.5 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-color)] hover:bg-[color-mix(in_srgb,var(--accent-color)_15%,transparent)] hover:border-[var(--accent-color)] hover:text-[var(--accent-color)] transition-all duration-200"
+                    href={`https://movie.douban.com/celebrities/search?search_text=${encodeURIComponent(name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-color)] hover:bg-[color-mix(in_srgb,var(--accent-color)_15%,transparent)] hover:border-[var(--accent-color)] hover:text-[var(--accent-color)] transition-all duration-200"
                   >
                     {name}
-                  </Link>
+                    <Icons.ExternalLink size={10} />
+                  </a>
                 ))}
               </span>
             </div>
