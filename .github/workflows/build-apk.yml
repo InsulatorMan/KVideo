@@ -35,9 +35,46 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # 4. 授予执行权限
-      - name: Grant execute permission for gradlew
-        run: chmod +x android-tv/gradlew
+      # 4. 检查并生成 Gradle Wrapper
+      - name: Setup Gradle Wrapper
+        working-directory: android-tv
+        run: |
+          if [ -f "gradlew" ]; then
+            echo "gradlew already exists"
+            chmod +x gradlew
+          else
+            echo "gradlew not found, generating..."
+            
+            # 创建 gradle wrapper 目录
+            mkdir -p gradle/wrapper
+            
+            # 下载 gradle-wrapper.jar
+            curl -L -o gradle/wrapper/gradle-wrapper.jar \
+              https://github.com/gradle/gradle/raw/v8.2.0/gradle/wrapper/gradle-wrapper.jar
+            
+            # 创建 gradle-wrapper.properties
+            cat > gradle/wrapper/gradle-wrapper.properties << 'EOF'
+          distributionBase=GRADLE_USER_HOME
+          distributionPath=wrapper/dists
+          distributionUrl=https\://services.gradle.org/distributions/gradle-8.2-bin.zip
+          zipStoreBase=GRADLE_USER_HOME
+          zipStorePath=wrapper/dists
+          EOF
+            
+            # 创建 gradlew 脚本
+            cat > gradlew << 'GRADLEW'
+          #!/bin/sh
+          APP_BASE_NAME=${0##*/}
+          APP_HOME=$( cd "${APP_HOME:-./}" && pwd -P )
+          DEFAULT_JVM_OPTS='"-Xmx64m"'
+          CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+          exec java $DEFAULT_JVM_OPTS -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
+          GRADLEW
+            
+            chmod +x gradlew
+            echo "Gradle wrapper generated successfully"
+            ls -la gradlew gradle/wrapper/
+          fi
 
       # 5. 修改 KVideo URL
       - name: Update KVideo URL
