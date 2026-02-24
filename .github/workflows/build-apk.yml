@@ -66,9 +66,8 @@ jobs:
           #!/bin/sh
           APP_BASE_NAME=${0##*/}
           APP_HOME=$( cd "${APP_HOME:-./}" && pwd -P )
-          DEFAULT_JVM_OPTS='"-Xmx64m"'
           CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
-          exec java $DEFAULT_JVM_OPTS -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
+          exec java -Xmx64m -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
           GRADLEW
             
             chmod +x gradlew
