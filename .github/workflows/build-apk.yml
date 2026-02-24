@@ -75,7 +75,39 @@ jobs:
             ls -la gradlew gradle/wrapper/
           fi
 
-      # 5. 修改 KVideo URL
+      # 5. 修复 settings.gradle.kts
+      - name: Fix settings.gradle.kts
+        working-directory: android-tv
+        run: |
+          # 查看原始文件
+          echo "=== Original settings.gradle.kts ==="
+          cat settings.gradle.kts || echo "File not found"
+          
+          # 重写 settings.gradle.kts 为兼容格式
+          cat > settings.gradle.kts << 'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = "KVideo"
+          include(":app")
+          EOF
+          
+          echo ""
+          echo "=== Fixed settings.gradle.kts ==="
+          cat settings.gradle.kts
+
+      # 6. 修改 KVideo URL
       - name: Update KVideo URL
         run: |
           URL="${{ github.event.inputs.kvideo_url || 'https://kvideo-2le.pages.dev/' }}"
@@ -83,12 +115,12 @@ jobs:
             android-tv/app/src/main/java/com/kvideo/tv/MainActivity.kt
           echo "Updated KVIDEO_URL to: $URL"
 
-      # 6. 构建 APK
+      # 7. 构建 APK
       - name: Build APK
         working-directory: android-tv
         run: ./gradlew assembleDebug --no-daemon
 
-      # 7. 上传 APK
+      # 8. 上传 APK
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -96,7 +128,7 @@ jobs:
           path: android-tv/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
-      # 8. 输出下载信息
+      # 9. 输出下载信息
       - name: Build Info
         run: |
           echo "✅ APK 构建成功！"
