@@ -107,7 +107,74 @@ jobs:
           echo "=== Fixed settings.gradle.kts ==="
           cat settings.gradle.kts
 
-      # 6. 修改 KVideo URL
+      # 6. 创建缺失的资源文件
+      - name: Create missing resources
+        working-directory: android-tv
+        run: |
+          # 创建 mipmap 目录
+          mkdir -p app/src/main/res/mipmap-anydpi-v26
+          mkdir -p app/src/main/res/mipmap-hdpi
+          mkdir -p app/src/main/res/mipmap-mdpi
+          mkdir -p app/src/main/res/mipmap-xhdpi
+          mkdir -p app/src/main/res/mipmap-xxhdpi
+          mkdir -p app/src/main/res/mipmap-xxxhdpi
+          
+          # 创建自适应图标 XML
+          cat > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/ic_launcher_background"/>
+              <foreground android:drawable="@drawable/ic_launcher_foreground"/>
+          </adaptive-icon>
+          EOF
+          
+          # 创建前景图标
+          mkdir -p app/src/main/res/drawable
+          cat > app/src/main/res/drawable/ic_launcher_foreground.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="108dp"
+              android:height="108dp"
+              android:viewportWidth="108"
+              android:viewportHeight="108">
+              <group android:translateX="27" android:translateY="27">
+                  <path
+                      android:fillColor="#FFFFFF"
+                      android:pathData="M27,27m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0"/>
+                  <path
+                      android:fillColor="#1E88E5"
+                      android:pathData="M27,12L27,42M12,27L42,27"
+                      android:strokeWidth="4"
+                      android:strokeColor="#1E88E5"/>
+              </group>
+          </vector>
+          EOF
+          
+          # 创建颜色资源
+          mkdir -p app/src/main/res/values
+          cat > app/src/main/res/values/colors.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="ic_launcher_background">#1E88E5</color>
+          </resources>
+          EOF
+          
+          # 创建简单的 PNG 图标作为后备（使用 ImageMagick 或 XML）
+          # 创建 drawable 图标作为后备
+          cat > app/src/main/res/drawable/ic_launcher.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android"
+              android:shape="rectangle">
+              <solid android:color="#1E88E5"/>
+              <size android:width="48dp" android:height="48dp"/>
+              <corners android:radius="8dp"/>
+          </shape>
+          EOF
+          
+          echo "Resources created successfully"
+          ls -la app/src/main/res/
+
+      # 7. 修改 KVideo URL
       - name: Update KVideo URL
         run: |
           URL="${{ github.event.inputs.kvideo_url || 'https://kvideo-2le.pages.dev/' }}"
@@ -115,12 +182,12 @@ jobs:
             android-tv/app/src/main/java/com/kvideo/tv/MainActivity.kt
           echo "Updated KVIDEO_URL to: $URL"
 
-      # 7. 构建 APK
+      # 8. 构建 APK
       - name: Build APK
         working-directory: android-tv
         run: ./gradlew assembleDebug --no-daemon
 
-      # 8. 上传 APK
+      # 9. 上传 APK
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -128,7 +195,7 @@ jobs:
           path: android-tv/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
-      # 9. 输出下载信息
+      # 10. 输出下载信息
       - name: Build Info
         run: |
           echo "✅ APK 构建成功！"
